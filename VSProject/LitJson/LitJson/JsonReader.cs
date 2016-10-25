@@ -30,6 +30,7 @@ namespace LitJson
 
         Int,
         Long,
+        Single,
         Double,
 
         String,

@@ -24,6 +24,7 @@ namespace LitJson
         #region Fields
         private IList<JsonData>               inst_array;
         private bool                          inst_boolean;
+        private float                         inst_float;
         private double                        inst_double;
         private int                           inst_int;
         private long                          inst_long;
@@ -50,6 +51,11 @@ namespace LitJson
             get { return type == JsonType.Boolean; }
         }
 
+        ////////////////////////////// add/ //////////////////////////////////////
+        public bool IsFloat
+        {
+            get { return type == JsonType.Float; }
+        }
         public bool IsDouble {
             get { return type == JsonType.Double; }
         }
@@ -148,6 +154,11 @@ namespace LitJson
 
         bool IJsonWrapper.IsBoolean {
             get { return IsBoolean; }
+        }
+        ////////////////////////////// add/ //////////////////////////////////////
+        bool IJsonWrapper.IsFloat
+        {
+            get { return IsFloat; }
         }
 
         bool IJsonWrapper.IsDouble {
@@ -315,6 +326,12 @@ namespace LitJson
             type = JsonType.Boolean;
             inst_boolean = boolean;
         }
+        ////////////////////////////// add/ //////////////////////////////////////
+        public JsonData(float number)
+        {
+            type = JsonType.Float;
+            inst_float = number;
+        }
 
         public JsonData (double number)
         {
@@ -342,6 +359,12 @@ namespace LitJson
                 return;
             }
 
+            if (obj is Single)
+            {
+                type = JsonType.Float;
+                inst_float = (float)obj;
+                return;
+            }
             if (obj is Double) {
                 type = JsonType.Double;
                 inst_double = (double) obj;
@@ -526,6 +549,15 @@ namespace LitJson
 
             return inst_boolean;
         }
+        ////////////////////////////// add/ //////////////////////////////////////
+        double IJsonWrapper.GetFloat()
+        {
+            if (type != JsonType.Float)
+                throw new InvalidOperationException(
+                    "JsonData instance doesn't hold a double");
+
+            return inst_float;
+        }
 
         double IJsonWrapper.GetDouble ()
         {
@@ -567,6 +599,13 @@ namespace LitJson
         {
             type = JsonType.Boolean;
             inst_boolean = val;
+            json = null;
+        }
+        ////////////////////////////// add/ //////////////////////////////////////
+        void IJsonWrapper.SetFloat(float val)
+        {
+            type = JsonType.Float;
+            inst_float = val;
             json = null;
         }
 
@@ -761,6 +800,13 @@ namespace LitJson
                 return;
             }
 
+            ///////////////////////////////// add /////////////////////////////
+            if (obj.IsFloat)
+            {
+                writer.Write(obj.GetFloat());
+                return;
+            }
+
             if (obj.IsInt) {
                 writer.Write (obj.GetInt ());
                 return;
@@ -842,7 +888,10 @@ namespace LitJson
                 return this.inst_int.Equals (x.inst_int);
 
             case JsonType.Long:
-                return this.inst_long.Equals (x.inst_long);
+                return this.inst_long.Equals(x.inst_long);
+            ////////////////////////////// add/ //////////////////////////////////////
+            case JsonType.Float:
+                return this.inst_float.Equals(x.inst_float);
 
             case JsonType.Double:
                 return this.inst_double.Equals (x.inst_double);
@@ -887,6 +936,10 @@ namespace LitJson
 
             case JsonType.Long:
                 inst_long = default (Int64);
+                break;
+            ////////////////////////////// add/ //////////////////////////////////////
+            case JsonType.Float:
+                inst_float = default(Single);
                 break;
 
             case JsonType.Double:
@@ -935,6 +988,10 @@ namespace LitJson
 
             case JsonType.Boolean:
                 return inst_boolean.ToString ();
+
+            ////////////////////////////// add/ //////////////////////////////////////
+            case JsonType.Float:
+                return inst_float.ToString();
 
             case JsonType.Double:
                 return inst_double.ToString ();

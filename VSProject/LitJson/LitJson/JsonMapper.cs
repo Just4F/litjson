@@ -313,8 +313,10 @@ namespace LitJson
             Type underlying_type = Nullable.GetUnderlyingType(inst_type);
             Type value_type = underlying_type ?? inst_type;
 
-            if (reader.Token == JsonToken.Null) {
-                if (inst_type.IsClass || underlying_type != null) {
+            if (reader.Token == JsonToken.Null)
+            {
+                if (inst_type.IsClass || underlying_type != null)
+                {
                     if (inst_type == typeof(System.String))
                     {
                         return "";
@@ -325,7 +327,9 @@ namespace LitJson
                 //            "Can't assign null to an instance of type {0}",
                 //            inst_type));
             }
-            if (reader.Token == JsonToken.Double ||
+
+            if (reader.Token == JsonToken.Single ||
+                reader.Token == JsonToken.Double ||
                 reader.Token == JsonToken.Int ||
                 reader.Token == JsonToken.Long ||
                 reader.Token == JsonToken.String ||
@@ -368,7 +372,59 @@ namespace LitJson
                 if (conv_op != null)
                     return conv_op.Invoke (null,
                                            new object[] { reader.Value });
-
+                
+                //////////////////////////////////// ADD ////////////////////////////////////
+                // ÀàÐÍ×ª»»
+                if (value_type.Name == "String" && json_type.Name != "String")
+                {
+                    return reader.Value.ToString();
+                }
+                else if (json_type.Name == "String")
+                {
+                    if (value_type.Name == "Int32")
+                    {
+                        int re = 0;
+                        int.TryParse(reader.Value as string, out re);
+                        return re;
+                    }
+                    else if (value_type.Name == "Single")
+                    {
+                        float re = 0;
+                        float.TryParse(reader.Value as string, out re);
+                        return re;
+                    }
+                    else if (value_type.Name == "Double")
+                    {
+                        double re = 0;
+                        double.TryParse(reader.Value as string, out re);
+                        return re;
+                    }
+                }
+                else if (value_type.Name == "Int32" && json_type.Name == "Double")
+                {
+                    return Convert.ToInt32((double)(reader.Value));
+                }
+                else if (value_type.Name == "Double" && json_type.Name == "Int32")
+                {
+                    return (double)(reader.Value);
+                }
+                else if (value_type.Name == "Single" && json_type.Name == "Double")
+                {
+                    return Convert.ToSingle((double)(reader.Value));
+                }
+                else if (value_type.Name == "Single" && json_type.Name == "Int32")
+                {
+                    return Convert.ToSingle((int)(reader.Value));
+                }
+                else if (value_type.Name == "Int32" && json_type.Name == "Single")
+                {
+                    return Convert.ToInt32((float)(reader.Value));
+                }
+                else if (value_type.Name == "Double" && json_type.Name == "Single")
+                {
+                    return Convert.ToDouble((float)(reader.Value));
+                }
+                ////////////////////////////////// ADD OVER /////////////////////////////////
                 // No luck
                 throw new JsonException (String.Format (
                         "Can't assign value '{0}' (type {1}) to type {2}",
@@ -416,10 +472,11 @@ namespace LitJson
                     instance = list;
 
             } else if (reader.Token == JsonToken.ObjectStart) {
-                AddObjectMetadata (value_type);
-                ObjectMetadata t_data = object_metadata[value_type];
 
-                instance = Activator.CreateInstance (value_type);
+                AddObjectMetadata (inst_type);
+                ObjectMetadata t_data = object_metadata[inst_type];
+
+                instance = Activator.CreateInstance (inst_type);
 
                 while (true) {
                     reader.Read ();
@@ -716,6 +773,13 @@ namespace LitJson
 
             if (obj is Double) {
                 writer.Write ((double) obj);
+                return;
+            }
+
+            ///////////////////////////////////// add /////////////////////////////////////////
+            if (obj is Single)
+            {
+                writer.Write((float)obj);
                 return;
             }
 
