@@ -11,7 +11,7 @@ namespace LitJson
     {
         static void Main(string[] args)
         {
-            Save();
+            //Save();
 
             Load();
         }
@@ -27,15 +27,17 @@ namespace LitJson
             tj.dicS2F.Add("sdf", 5554.123f);
             tj.dicS2F.Add("111", 6566);
             //tj.vec = new Vector3(6, 4, 3);
-            tj.param_s = new TokenJson[2];
-            tj.param_s[0] = new TokenJson();
-            tj.param_s[1] = new TokenJson();
-            var tk = tj.param_s[0];
+            tj.paramss = new TokenJson[2];
+            tj.paramss[0] = new TokenJson();
+            tj.paramss[1] = new TokenJson();
+            var tk = tj.paramss[0];
             tk.name = "0";
             tk.type = "123";
             tk.value = "vvv";
+            tk.paramss.Add("1", 1);
+            tk.paramss.Add("2", 2);
 
-            tk = tj.param_s[1];
+            tk = tj.paramss[1];
             tk.name = "1";
             tk.type = "111";
             tk.value = "333, 444, 56556";
@@ -46,8 +48,10 @@ namespace LitJson
 
         static void Load()
         {
-            string str = UtilsCommonS.LoadFile2String("C:\\Users\\xRop\\Desktop/js.json");
-            TestJson tj = JsonMapper.ToObject<TestJson>(str);
+            string str = UtilsCommonS.LoadFile2String("C:\\Users\\xRop\\Desktop/jsparams.json");
+            JsonReader jd = new JsonReader(str);
+            jd.Try_paramss_Load_params = true;
+            TestJson tj = JsonMapper.ToObject<TestJson>(jd);
             int i = tj.interger[0];
         }
 
@@ -57,7 +61,7 @@ namespace LitJson
             public List<int> interger;
             public Dictionary<string, float> dicS2F;
             //public Vector3 vec;
-            public TokenJson[] param_s;
+            public TokenJson[] paramss;
         }
 
         public class TokenJson
@@ -65,6 +69,7 @@ namespace LitJson
             public string name;
             public string type;
             public string value;
+            public Dictionary<string, int> paramss = new Dictionary<string, int>();
         }
     }
 }

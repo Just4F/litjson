@@ -57,6 +57,7 @@ namespace LitJson
         private TextReader    reader;
         private bool          reader_is_owned;
         private bool          skip_non_members;
+        private bool          try_paramss_Load_params;
         private object        token_value;
         private JsonToken     token;
         #endregion
@@ -71,6 +72,12 @@ namespace LitJson
         public bool AllowSingleQuotedStrings {
             get { return lexer.AllowSingleQuotedStrings; }
             set { lexer.AllowSingleQuotedStrings = value; }
+        }
+
+        public bool Try_paramss_Load_params
+        {
+            get { return try_paramss_Load_params; }
+            set { try_paramss_Load_params = value; }
         }
 
         public bool SkipNonMembers {

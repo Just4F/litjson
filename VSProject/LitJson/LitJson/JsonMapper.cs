@@ -128,6 +128,9 @@ namespace LitJson
 
         private static JsonWriter      static_writer;
         private static readonly object static_writer_lock = new Object ();
+
+        const string Str_paramss = "paramss";
+        const string Str_params = "params";
         #endregion
 
 
@@ -487,25 +490,7 @@ namespace LitJson
                     string property = (string) reader.Value;
 
                     if (t_data.Properties.ContainsKey (property)) {
-                        PropertyMetadata prop_data =
-                            t_data.Properties[property];
-
-                        if (prop_data.IsField) {
-                            ((FieldInfo) prop_data.Info).SetValue (
-                                instance, ReadValue (prop_data.Type, reader));
-                        } else {
-                            PropertyInfo p_info =
-                                (PropertyInfo) prop_data.Info;
-
-                            if (p_info.CanWrite)
-                                p_info.SetValue (
-                                    instance,
-                                    ReadValue (prop_data.Type, reader),
-                                    null);
-                            else
-                                ReadValue (prop_data.Type, reader);
-                        }
-
+                        ReadProperty(t_data, property, instance, reader);
                     } else {
                         if (! t_data.IsDictionary) {
 
@@ -515,6 +500,15 @@ namespace LitJson
                                         "property '{1}'",
                                         inst_type, property));
                             } else {
+                                if (reader.Try_paramss_Load_params)
+                                {
+                                    if (property == Str_params)
+                                    {
+                                        ReadProperty(t_data, Str_paramss, instance, reader);
+                                        continue;
+                                    }
+                                }
+
                                 ReadSkip (reader);
                                 continue;
                             }
@@ -530,6 +524,30 @@ namespace LitJson
             }
 
             return instance;
+        }
+
+        static void ReadProperty(ObjectMetadata t_data, string property, object instance, JsonReader reader)
+        {
+            PropertyMetadata prop_data = t_data.Properties[property];
+
+            if (prop_data.IsField)
+            {
+                ((FieldInfo)prop_data.Info).SetValue(
+                    instance, ReadValue(prop_data.Type, reader));
+            }
+            else {
+                PropertyInfo p_info =
+                    (PropertyInfo)prop_data.Info;
+
+                if (p_info.CanWrite)
+                    p_info.SetValue(
+                        instance,
+                        ReadValue(prop_data.Type, reader),
+                        null);
+                else
+                    ReadValue(prop_data.Type, reader);
+            }
+
         }
 
         private static IJsonWrapper ReadValue (WrapperFactory factory,
