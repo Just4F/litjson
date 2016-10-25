@@ -315,14 +315,16 @@ namespace LitJson
 
             if (reader.Token == JsonToken.Null) {
                 if (inst_type.IsClass || underlying_type != null) {
+                    if (inst_type == typeof(System.String))
+                    {
+                        return "";
+                    }
                     return null;
                 }
-
-                throw new JsonException (String.Format (
-                            "Can't assign null to an instance of type {0}",
-                            inst_type));
+                //throw new JsonException(String.Format(
+                //            "Can't assign null to an instance of type {0}",
+                //            inst_type));
             }
-
             if (reader.Token == JsonToken.Double ||
                 reader.Token == JsonToken.Int ||
                 reader.Token == JsonToken.Long ||
