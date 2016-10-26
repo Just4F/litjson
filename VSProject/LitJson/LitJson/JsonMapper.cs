@@ -504,8 +504,12 @@ namespace LitJson
                                 {
                                     if (property == Str_params)
                                     {
-                                        ReadProperty(t_data, Str_paramss, instance, reader);
-                                        continue;
+                                        string replacedProperty = Str_paramss;
+                                        if (t_data.Properties.ContainsKey(replacedProperty))
+                                        {
+                                            ReadProperty(t_data, replacedProperty, instance, reader);
+                                            continue;
+                                        }
                                     }
                                 }
 
